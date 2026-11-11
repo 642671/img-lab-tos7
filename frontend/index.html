@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>图片实验室</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=__APP_VERSION__">
+  <link rel="stylesheet" href="styles.css?v=__APP_VERSION__">
+  <script src="theme.js?v=__APP_VERSION__"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="window-titlebar" aria-hidden="true">
+    <span class="titlebar-brand">
+      <span class="titlebar-dot" aria-hidden="true"></span>
+      图片实验室
+    </span>
+    <span class="titlebar-hint">离线 · 本机生成</span>
+  </header>
+
+  <main id="main" class="app-shell">
+    <div class="shell-inner">
+      <header class="hero">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" role="presentation">
+              <rect x="3" y="4" width="26" height="24" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="21.5" cy="12" r="2.4" fill="currentColor"/>
+              <path d="M6.5 23.5 13 17l4.2 4.2 3.3-3.3 5 5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div class="brand-text">
+            <div class="brand-title-row">
+              <h1>图片实验室</h1>
+              <span class="version-badge" id="appVersion">v__APP_VERSION__</span>
+            </div>
+            <p class="brand-subtitle">离线生成指定分辨率或指定体积的测试图片，用真实编码结果校准，并测量目标地址的响应速度。</p>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <span class="connection-pill" id="connectionPill" data-state="pending">
+            <span class="connection-dot" aria-hidden="true"></span>
+            <span id="connectionText">正在连接</span>
+          </span>
+          <button id="themeToggle" class="icon-button" type="button" aria-label="切换主题" title="切换主题">
+            <svg class="theme-icon theme-icon-light" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <svg class="theme-icon theme-icon-dark" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.5 8.5 0 1 0 10.2 10.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <nav class="tabs" role="tablist" aria-label="功能">
+        <button class="tab is-active" id="tabGenerator" type="button" role="tab" aria-selected="true" aria-controls="panelGenerator" data-tab="generator">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="4.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            <circle cx="15.5" cy="9.5" r="1.7" fill="currentColor"/>
+            <path d="m6 17 4.6-4.6 3 3 2.4-2.4 2 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          生成器
+        </button>
+        <button class="tab" id="tabSpeed" type="button" role="tab" aria-selected="false" aria-controls="panelSpeed" data-tab="speed">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4a8 8 0 0 1 8 8H12z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M12 12 7.5 17.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="1.4" fill="currentColor"/>
+            <path d="M4 12a8 8 0 0 0 16 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+          响应测速
+        </button>
+      </nav>
+
+      <div id="appBanner" class="error-banner" role="alert" hidden>
+        <span class="error-mark" aria-hidden="true">!</span>
+        <span id="appBannerText"></span>
+        <button id="appRetryButton" class="text-button" type="button">重新连接</button>
+      </div>
+
+      <section id="panelGenerator" class="tab-panel" role="tabpanel" aria-labelledby="tabGenerator">
+        <div class="generator-layout">
+          <aside class="panel config-panel" aria-label="生成设置">
+            <form id="generateForm" novalidate>
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">GENERATE</p>
+                  <h2>生成设置</h2>
+                </div>
+                <span class="panel-note" id="encoderNote">本机编码</span>
+              </div>
+
+              <div class="field">
+                <span class="field-label" id="modeLabel">生成方式</span>
+                <div class="segmented" id="modeSegmented" role="group" aria-labelledby="modeLabel">
+                  <button type="button" class="segment is-active" data-mode="resolution" aria-pressed="true">按分辨率</button>
+                  <button type="button" class="segment" data-mode="bytes" aria-pressed="false">按目标体积</button>
+                </div>
+              </div>
+
+              <div id="resolutionFields" class="mode-fields">
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="widthInput">宽度</label>
+                    <div class="input-suffix">
+                      <input id="widthInput" type="number" min="128" max="16384" step="1" value="1920" inputmode="numeric">
+                      <span>px</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="heightInput">高度</label>
+                    <div class="input-suffix">
+                      <input id="heightInput" type="number" min="128" max="16384" step="1" value="1080" inputmode="numeric">
+                      <span>px</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="preset-row" aria-label="常用分辨率">
+                  <button type="button" class="chip" data-width="1920" data-height="1080">1080p</button>
+                  <button type="button" class="chip" data-width="2560" data-height="1440">1440p</button>
+                  <button type="button" class="chip" data-width="3840" data-height="2160">4K</button>
+                  <button type="button" class="chip" data-width="4000" data-height="3000">12MP</button>
+                  <button type="button" class="chip" data-width="8000" data-height="6000">48MP</button>
+                </div>
+              </div>
+
+              <div id="bytesFields" class="mode-fields" hidden>
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="targetSize">目标体积</label>
+                    <div class="input-suffix">
+                      <input id="targetSize" type="number" min="0.001" max="256" step="0.1" value="5" inputmode="decimal">
+                      <span>MiB</span>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="aspectSelect">宽高比</label>
+                    <select id="aspectSelect">
+                      <option value="1.3333333333333333" selected>4:3</option>
+                      <option value="1.5">3:2</option>
+                      <option value="1.7777777777777777">16:9</option>
+                      <option value="1">1:1</option>
+                      <option value="0.5625">9:16</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="preset-row" aria-label="常用目标体积">
+                  <button type="button" class="chip" data-size="1">1 MiB</button>
+                  <button type="button" class="chip" data-size="5">5 MiB</button>
+                  <button type="button" class="chip" data-size="8">8 MiB</button>
+                </div>
+                <p class="hint">自动求解分辨率，质量保持不变；以真实编码结果校准，偏差目标 ≤ 1.5%。</p>
+              </div>
+
+              <div class="field-grid">
+                <div class="field">
+                  <label for="formatSelect">图片格式</label>
+                  <select id="formatSelect">
+                    <option value="jpeg" selected>JPEG</option>
+                    <option value="png">PNG</option>
+                    <option value="webp">WebP</option>
+                  </select>
+                  <p class="hint" id="formatHint" hidden></p>
+                </div>
+                <div class="field">
+                  <label for="qualityInput">编码质量</label>
+                  <div class="quality-row">
+                    <input id="qualityRange" type="range" min="1" max="100" step="1" value="85" aria-label="编码质量">
+                    <input id="qualityInput" type="number" min="1" max="100" step="1" value="85" inputmode="numeric">
+                  </div>
+                  <p class="hint" id="qualityHint">1–100，越大文件越大。</p>
+                </div>
+              </div>
+
+              <fieldset class="content-field">
+                <legend>内容模型</legend>
+                <div class="content-grid" id="contentOptions">
+                  <label class="content-card">
+                    <input type="radio" name="content" value="photo" checked>
+                    <span class="content-swatch swatch-photo" aria-hidden="true"></span>
+                    <span class="content-copy">
+                      <strong>照片纹理</strong>
+                      <small>渐变 + 色块 + 纹理 + 噪声，最接近真实照片</small>
+                    </span>
+                  </label>
+                  <label class="content-card">
+                    <input type="radio" name="content" value="gradient">
+                    <span class="content-swatch swatch-gradient" aria-hidden="true"></span>
+                    <span class="content-copy">
+                      <strong>平滑渐变</strong>
+                      <small>压缩率很高，适合低码率场景</small>
+                    </span>
+                  </label>
+                  <label class="content-card">
+                    <input type="radio" name="content" value="solid">
+                    <span class="content-swatch swatch-solid" aria-hidden="true"></span>
+                    <span class="content-copy">
+                      <strong>纯色块</strong>
+                      <small>压缩率极高，用于极端下限测试</small>
+                    </span>
+                  </label>
+                  <label class="content-card">
+                    <input type="radio" name="content" value="noise">
+                    <span class="content-swatch swatch-noise" aria-hidden="true"></span>
+                    <span class="content-copy">
+                      <strong>高频噪声</strong>
+                      <small>逐像素随机，不可压缩，用于压力测试</small>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <label class="switch-row" for="probeToggle">
+                <span class="switch-copy">
+                  <strong>降采样探针</strong>
+                  <small>四角黑白条纹块，缩放或重采样后条纹会变灰；PNG 为 1 px 条纹，JPEG/WebP 对齐 8×8 DCT 块。</small>
+                </span>
+                <span class="switch-control">
+                  <input id="probeToggle" type="checkbox" class="switch-input">
+                  <span class="switch-track" aria-hidden="true"></span>
+                </span>
+              </label>
+
+              <div class="field">
+                <label for="seedInput">随机种子</label>
+                <input id="seedInput" type="number" min="0" max="2147483647" step="1" value="424242" inputmode="numeric">
+                <p class="hint">相同参数与种子会生成完全相同的图片。</p>
+              </div>
+
+              <div class="plan-card" id="planCard">
+                <button class="plan-preview" id="previewButton" type="button" title="查看大图预览" aria-label="查看大图预览">
+                  <img id="previewImage" alt="生成内容预览" loading="lazy">
+                  <span class="preview-fallback" id="previewFallback">预览</span>
+                </button>
+                <div class="plan-copy">
+                  <div class="plan-label-row">
+                    <span class="eyebrow">PLAN</span>
+                    <span class="estimate-tag" id="planEstimateTag">预估</span>
+                  </div>
+                  <strong id="planDims">—</strong>
+                  <span id="planDetail">—</span>
+                  <span class="plan-note" id="planNote" hidden></span>
+                </div>
+              </div>
+              <p class="inline-error" id="planError" role="alert" hidden></p>
+
+              <div class="form-actions">
+                <button id="generateButton" class="primary-button" type="submit">
+                  <span class="button-spinner" aria-hidden="true"></span>
+                  <span>生成图片</span>
+                </button>
+                <button id="cancelGenerateButton" class="secondary-button danger" type="button" hidden>取消</button>
+              </div>
+
+              <details class="batch-panel" id="batchPanel">
+                <summary>
+                  <span>批量生成</span>
+                  <span class="batch-badge" id="batchCount">0</span>
+                </summary>
+                <div class="batch-body">
+                  <p class="hint">每行一个规格，如 <code>1920x1080</code> 或 <code>5MiB</code>。全部沿用上面的格式、质量、内容与探针设置，最多 50 张。</p>
+                  <textarea id="batchInput" rows="5" spellcheck="false" placeholder="1920x1080&#10;2560x1440&#10;3840x2160&#10;5MiB"></textarea>
+                  <p class="inline-error" id="batchError" role="alert" hidden></p>
+                  <button id="batchButton" class="secondary-button" type="button">批量生成</button>
+                </div>
+              </details>
+            </form>
+          </aside>
+
+          <section class="panel results-panel" aria-label="生成结果">
+            <div class="results-header">
+              <div>
+                <p class="eyebrow">LIBRARY</p>
+                <div class="results-title-row">
+                  <h2>生成结果</h2>
+                  <span class="count-badge" id="libraryCount">0 个文件</span>
+                </div>
+                <p class="results-subtitle" id="librarySubtitle">生成后会在这里显示真实像素、实际字节与偏差。</p>
+              </div>
+              <div class="results-actions">
+                <button id="exportCsvButton" class="secondary-button" type="button" disabled>导出 CSV</button>
+                <button id="bundleButton" class="secondary-button" type="button" disabled>打包 ZIP</button>
+                <button id="clearButton" class="ghost-button danger" type="button" disabled>清空</button>
+              </div>
+            </div>
+
+            <div class="job-banner" id="jobBanner" hidden aria-live="polite">
+              <div class="job-head">
+                <span class="job-spinner" aria-hidden="true"></span>
+                <strong id="jobTitle">正在生成</strong>
+                <span id="jobDetail"></span>
+              </div>
+              <div class="progress-track"><span class="progress-fill" id="jobProgressFill"></span></div>
+              <div class="job-foot">
+                <span id="jobStage">准备中</span>
+                <span id="jobCounter"></span>
+              </div>
+            </div>
+
+            <div class="summary-grid">
+              <div class="summary-card">
+                <span class="summary-label">文件数量</span>
+                <strong id="summaryCount">0</strong>
+                <span class="summary-foot" id="summaryCountFoot">累计生成</span>
+              </div>
+              <div class="summary-card">
+                <span class="summary-label">占用空间</span>
+                <strong id="summaryBytes">0 B</strong>
+                <span class="summary-foot">本机应用数据目录</span>
+              </div>
+              <div class="summary-card accent">
+                <span class="summary-label">目标体积收敛率</span>
+                <strong id="summaryConverged">—</strong>
+                <span class="summary-foot" id="summaryConvergedFoot">按目标体积生成的图片</span>
+              </div>
+              <div class="summary-card">
+                <span class="summary-label">最近生成</span>
+                <strong id="summaryLatest">—</strong>
+                <span class="summary-foot" id="summaryLatestFoot">尚无记录</span>
+              </div>
+            </div>
+
+            <div id="libraryEmpty" class="empty-state">
+              <svg viewBox="0 0 96 96" aria-hidden="true">
+                <rect x="14" y="20" width="68" height="52" rx="9" fill="none" stroke="currentColor" stroke-width="3"/>
+                <circle cx="63" cy="35" r="6" fill="none" stroke="currentColor" stroke-width="3"/>
+                <path d="m20 62 17-17 11 11 8-8 20 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M30 84h36" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <h3>还没有生成结果</h3>
+              <p>左侧选择“按分辨率”或“按目标体积”，生成后会显示真实像素、实际字节与偏差，并可导出 CSV 或打包 ZIP。</p>
+            </div>
+
+            <div id="libraryList" class="library-list" aria-live="polite"></div>
+
+            <div class="results-footer">
+              <span id="libraryFoot">最多保留 200 个文件，总计 1.5 GiB；超出后自动清理最旧的文件。</span>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="panelSpeed" class="tab-panel" role="tabpanel" aria-labelledby="tabSpeed" hidden>
+        <div class="speed-layout">
+          <aside class="panel config-panel" aria-label="测速设置">
+            <form id="speedForm" novalidate>
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">SPEED</p>
+                  <h2>响应测速</h2>
+                </div>
+                <span class="panel-note">只读 GET</span>
+              </div>
+              <div class="field">
+                <label for="speedUrl">目标地址</label>
+                <input id="speedUrl" type="url" placeholder="https://example.com/api/ping" autocomplete="off" spellcheck="false">
+                <p class="hint">只发送 GET 请求，不会上传图片或登录信息；内网地址也可直接填写。</p>
+              </div>
+              <div class="field-grid three">
+                <div class="field">
+                  <label for="speedConcurrency">并发</label>
+                  <input id="speedConcurrency" type="number" min="1" max="16" step="1" value="4" inputmode="numeric">
+                </div>
+                <div class="field">
+                  <label for="speedRounds">轮次</label>
+                  <input id="speedRounds" type="number" min="1" max="20" step="1" value="3" inputmode="numeric">
+                </div>
+                <div class="field">
+                  <label for="speedTimeout">超时</label>
+                  <div class="input-suffix">
+                    <input id="speedTimeout" type="number" min="1" max="60" step="1" value="10" inputmode="numeric">
+                    <span>秒</span>
+                  </div>
+                </div>
+              </div>
+              <p class="hint" id="speedRequestHint">共 12 个请求，最多并发 4 个。</p>
+              <p class="inline-error" id="speedError" role="alert" hidden></p>
+              <div class="form-actions">
+                <button id="speedButton" class="primary-button" type="submit">
+                  <span class="button-spinner" aria-hidden="true"></span>
+                  <span>开始测速</span>
+                </button>
+                <button id="cancelSpeedButton" class="secondary-button danger" type="button" hidden>取消</button>
+              </div>
+            </form>
+
+            <div class="explain-card">
+              <h3>时间怎么拆分</h3>
+              <ul>
+                <li><strong>网络传输</strong>：连接、发送、等待首字节、下载正文，由本应用逐段计时。</li>
+                <li><strong>服务器处理</strong>：优先读取 <code>Server-Timing</code> 的 <code>dur</code>，其次 <code>X-Response-Time</code>、<code>X-Runtime</code>；目标未返回时明确显示“不可用”。</li>
+                <li>重定向最多跟随 3 次，耗时按整条链路累加；响应正文最多读取 32 MiB。</li>
+              </ul>
+            </div>
+          </aside>
+
+          <section class="panel speed-results" aria-label="测速结果">
+            <div class="results-header">
+              <div>
+                <p class="eyebrow">RESULT</p>
+                <div class="results-title-row">
+                  <h2>测速结果</h2>
+                  <span class="count-badge" id="speedBadge">等待开始</span>
+                </div>
+                <p class="results-subtitle" id="speedSubtitle">填写目标地址后开始，结果会显示 p50、p95 和失败率。</p>
+              </div>
+            </div>
+
+            <div class="job-banner" id="speedJobBanner" hidden aria-live="polite">
+              <div class="job-head">
+                <span class="job-spinner" aria-hidden="true"></span>
+                <strong>正在测速</strong>
+                <span id="speedJobDetail"></span>
+              </div>
+              <div class="progress-track"><span class="progress-fill" id="speedProgressFill"></span></div>
+              <div class="job-foot">
+                <span id="speedJobStage">准备中</span>
+                <span id="speedJobCounter"></span>
+              </div>
+            </div>
+
+            <div class="job-banner is-error" id="speedFailure" hidden role="alert">
+              <div class="job-head">
+                <span class="error-mark" aria-hidden="true">!</span>
+                <strong>测速失败</strong>
+                <span id="speedFailureText"></span>
+              </div>
+            </div>
+
+            <div id="speedEmpty" class="empty-state">
+              <svg viewBox="0 0 96 96" aria-hidden="true">
+                <path d="M48 14a34 34 0 0 1 34 34H48z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M48 48 28 68" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="48" cy="48" r="5" fill="none" stroke="currentColor" stroke-width="3"/>
+                <path d="M14 48a34 34 0 0 0 68 0" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <h3>还没有测速结果</h3>
+              <p>左侧填写目标地址、并发和轮次，应用会分别统计总耗时、网络各阶段耗时与服务器处理时间。</p>
+            </div>
+
+            <div id="speedSummary" hidden>
+              <div class="stat-grid">
+                <div class="stat-card">
+                  <span>总耗时 p50</span>
+                  <strong id="speedP50">—</strong>
+                  <small id="speedP50Foot">包含网络与处理</small>
+                </div>
+                <div class="stat-card">
+                  <span>总耗时 p95</span>
+                  <strong id="speedP95">—</strong>
+                  <small id="speedP95Foot">长尾延迟</small>
+                </div>
+                <div class="stat-card accent">
+                  <span>服务器处理 p50</span>
+                  <strong id="speedServerP50">—</strong>
+                  <small id="speedServerFoot">来自响应头</small>
+                </div>
+                <div class="stat-card">
+                  <span>失败率</span>
+                  <strong id="speedFailRate">—</strong>
+                  <small id="speedFailFoot">—</small>
+                </div>
+              </div>
+
+              <div class="timing-card">
+                <div class="timing-head">
+                  <h3>平均耗时拆分</h3>
+                  <span id="timingTotal">—</span>
+                </div>
+                <div class="timing-bar" id="timingBar">
+                  <span class="timing-seg seg-connect" data-seg="connect"></span>
+                  <span class="timing-seg seg-send" data-seg="send"></span>
+                  <span class="timing-seg seg-wait" data-seg="wait"></span>
+                  <span class="timing-seg seg-download" data-seg="download"></span>
+                </div>
+                <div class="timing-legend" id="timingLegend">
+                  <span><i class="dot dot-connect" aria-hidden="true"></i>连接 <b data-value="connect">—</b></span>
+                  <span><i class="dot dot-send" aria-hidden="true"></i>发送 <b data-value="send">—</b></span>
+                  <span><i class="dot dot-wait" aria-hidden="true"></i>等待首字节 <b data-value="wait">—</b></span>
+                  <span><i class="dot dot-download" aria-hidden="true"></i>下载正文 <b data-value="download">—</b></span>
+                </div>
+                <p class="hint" id="serverNote"></p>
+                <div class="compare-block" id="serverCompare" hidden>
+                  <h4>网络传输 vs 服务器处理</h4>
+                  <div class="compare-row">
+                    <span>网络传输</span>
+                    <div class="compare-track"><span id="networkBar" class="compare-fill network"></span></div>
+                    <b id="networkValue">—</b>
+                  </div>
+                  <div class="compare-row">
+                    <span>服务器处理</span>
+                    <div class="compare-track"><span id="serverBar" class="compare-fill server"></span></div>
+                    <b id="serverValue">—</b>
+                  </div>
+                  <p class="hint" id="compareNote"></p>
+                </div>
+              </div>
+
+              <div class="result-meta">
+                <span id="speedUrlLabel"></span>
+                <span id="speedStatuses"></span>
+              </div>
+
+              <div class="table-wrap">
+                <table class="samples-table">
+                  <thead>
+                    <tr>
+                      <th>轮次</th>
+                      <th>并发</th>
+                      <th>状态</th>
+                      <th>总耗时</th>
+                      <th>连接</th>
+                      <th>等待</th>
+                      <th>下载</th>
+                      <th>服务器</th>
+                      <th>大小</th>
+                    </tr>
+                  </thead>
+                  <tbody id="speedSamples"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <footer class="app-footer">
+      <span>图片仅在本机生成 · 不连接外部服务</span>
+      <span>img-lab v<span id="footerVersion">__APP_VERSION__</span></span>
+    </footer>
+  </main>
+
+  <dialog id="previewDialog" class="preview-dialog" aria-labelledby="previewDialogTitle">
+    <div class="dialog-header">
+      <div>
+        <p class="eyebrow">PREVIEW</p>
+        <h2 id="previewDialogTitle">内容预览</h2>
+      </div>
+      <button id="previewClose" class="icon-button" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="dialog-image"><img id="previewLarge" alt="生成内容大图预览"></div>
+    <p class="hint">预览用于确认构图与纹理，不代表最终编码后的清晰度；实际输出以左侧参数生成的图片为准。</p>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="tools.js?v=__APP_VERSION__" defer></script>
+  <script src="app.js?v=__APP_VERSION__" defer></script>
+</body>
+</html>

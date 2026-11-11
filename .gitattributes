@@ -1,0 +1,19 @@
+* text=auto eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.ini text eol=lf
+*.lang text eol=lf
+*.env text eol=lf
+*.service text eol=lf
+*.sh text eol=lf
+DEBIAN/control text eol=lf
+DEBIAN/postinst text eol=lf
+DEBIAN/prerm text eol=lf
+DEBIAN/postrm text eol=lf
+*.svg text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.deb binary
+*.bz2 binary

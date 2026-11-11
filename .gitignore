@@ -1,0 +1,21 @@
+# Build output and local verification artifacts
+/build/
+/dist/
+/output/
+*.deb
+*.sha256
+
+# Python runtime caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node and editor artifacts
+node_modules/
+.vscode/
+.idea/
+*.log
+
+# Local scratch data
+data/
+logs/

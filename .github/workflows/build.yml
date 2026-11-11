@@ -1,0 +1,65 @@
+name: Build TOS package
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install encoder libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libjpeg-turbo8 libwebp7
+
+      - name: Compile Python
+        run: python -m compileall -q backend
+
+      - name: Check frontend JavaScript
+        run: |
+          node --check frontend/theme.js
+          node --check frontend/tools.js
+          node --check frontend/app.js
+          node --test tests/frontend_tools.test.js
+
+      - name: Run backend tests
+        run: python -m unittest discover -s backend/tests -v
+
+      - name: Build x86_64 package
+        run: python build.py --platform x86_64
+
+      - name: Build aarch64 package
+        run: python build.py --platform aarch64
+
+      - name: Verify checksums
+        run: |
+          cd dist
+          sha256sum -c *.sha256
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: img-lab-packages
+          path: |
+            dist/*.deb
+            dist/*.sha256

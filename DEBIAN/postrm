@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+
+APP_ID="img-lab"
+APP_USER="img-lab"
+SYSTEM_ID="imglab-system"
+APP_DIR="/usr/local/${APP_ID}"
+SOCKET_PATH="/var/api/${APP_ID}.sock"
+
+if [ -d /run/systemd/system ]; then
+    systemctl stop "${SYSTEM_ID}.service" 2>/dev/null || true
+    systemctl disable "${SYSTEM_ID}.service" 2>/dev/null || true
+fi
+
+if [ -S "${SOCKET_PATH}" ]; then
+    rm -f "${SOCKET_PATH}" 2>/dev/null || true
+fi
+
+case "$1" in
+    remove|purge)
+        rm -f "/etc/systemd/system/${SYSTEM_ID}.service"
+        if [ -d /run/systemd/system ]; then
+            systemctl daemon-reload 2>/dev/null || true
+        fi
+        rm -rf "${APP_DIR}"
+        ;;
+esac
+
+if [ "$1" = "purge" ]; then
+    if getent passwd "${APP_USER}" >/dev/null 2>&1; then
+        userdel "${APP_USER}" 2>/dev/null || true
+    fi
+fi
+
+exit 0

@@ -1,0 +1,34 @@
+[Unit]
+Description=Image Lab service for TOS 7
+After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=img-lab
+WorkingDirectory=/usr/local/img-lab
+ExecStart=/usr/bin/python3 /usr/local/img-lab/bin/img-lab-service
+ExecStopPost=-/bin/rm -f /var/api/img-lab.sock
+EnvironmentFile=-/usr/local/img-lab/img-lab.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+TimeoutStartSec=30
+TimeoutStopSec=10
+KillMode=control-group
+KillSignal=SIGTERM
+SendSIGKILL=yes
+ProtectSystem=strict
+ProtectHome=true
+ProtectControlGroups=true
+ReadWritePaths=/usr/local/img-lab/data /usr/local/img-lab/logs /var/api
+LimitNOFILE=65536
+LimitNPROC=256
+MemoryMax=1G
+CPUQuota=200%
+Restart=on-failure
+RestartSec=10
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

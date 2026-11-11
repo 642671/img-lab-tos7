@@ -1,0 +1,10 @@
+Package: img-lab
+Version: 0.1.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Yuii <yuii@localhost>
+Depends: python3 (>= 3.10), systemd
+Description: 图片实验室 — 本地测试图片生成与响应速度测量
+ 离线生成指定分辨率或指定体积的测试图片，按真实编码结果校准体积，
+ 导出 CSV 清单与打包 ZIP，并测量目标地址的响应速度。

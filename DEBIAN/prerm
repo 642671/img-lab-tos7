@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+APP_ID="img-lab"
+SYSTEM_ID="imglab-system"
+SOCKET_PATH="/var/api/${APP_ID}.sock"
+
+if [ -d /run/systemd/system ]; then
+    systemctl stop "${SYSTEM_ID}.service" 2>/dev/null || true
+    systemctl disable "${SYSTEM_ID}.service" 2>/dev/null || true
+fi
+
+if [ -S "${SOCKET_PATH}" ]; then
+    rm -f "${SOCKET_PATH}" 2>/dev/null || true
+fi
+
+exit 0

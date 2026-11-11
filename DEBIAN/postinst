@@ -1,0 +1,144 @@
+#!/bin/sh
+set -e
+
+APP_ID="img-lab"
+APP_USER="img-lab"
+SYSTEM_ID="imglab-system"
+APP_DIR="/usr/local/${APP_ID}"
+WEBUI_ARCHIVE="${APP_DIR}/webui.bz2"
+WEBUI_DIR="${APP_DIR}/webui"
+UNIT_SRC="${APP_DIR}/init.d/${SYSTEM_ID}.service"
+UNIT_DST="/etc/systemd/system/${SYSTEM_ID}.service"
+LAUNCHER="${APP_DIR}/bin/${APP_ID}-service"
+SOCKET_PATH="/var/api/${APP_ID}.sock"
+LOG_DIR="${APP_DIR}/logs"
+DATA_DIR="${APP_DIR}/data"
+DIAG_FILE="${LOG_DIR}/postinst-diagnostic.txt"
+APP_GROUP=""
+
+log() {
+    printf '[%s] %s %s\n' "${APP_ID}" "$1" "$2"
+}
+
+collect_diagnostics() {
+    reason="$1"
+    mkdir -p "${LOG_DIR}" 2>/dev/null || true
+    {
+        printf 'reason: %s\n' "${reason}"
+        printf 'app: %s\n' "${APP_ID}"
+        printf 'systemd unit: %s.service\n\n' "${SYSTEM_ID}"
+        printf '=== identity ===\n'
+        id "${APP_USER}" 2>&1 || printf 'user %s does not exist\n' "${APP_USER}"
+        printf '\n=== runtime prerequisites ===\n'
+        ls -l /usr/bin/python3 2>&1 || printf '/usr/bin/python3 missing\n'
+        /usr/bin/python3 --version 2>&1 || true
+        ls -l "${LAUNCHER}" 2>&1 || printf '%s missing\n' "${LAUNCHER}"
+        ls -l "${UNIT_SRC}" 2>&1 || printf '%s missing\n' "${UNIT_SRC}"
+        ls -l "${WEBUI_DIR}/index.html" 2>&1 || printf 'webui index missing\n'
+        ls -l /usr/lib/*/libjpeg.so.8 2>&1 || true
+        ls -l /usr/lib/*/libwebp.so.7 2>&1 || true
+        printf '\n=== unit state ===\n'
+        systemctl is-active "${SYSTEM_ID}.service" 2>&1 || true
+        systemctl status --no-pager -l "${SYSTEM_ID}.service" 2>&1 || true
+        systemctl cat --no-pager "${SYSTEM_ID}.service" 2>&1 || true
+        printf '\n=== recent service logs ===\n'
+        journalctl --no-pager -n 120 -u "${SYSTEM_ID}.service" 2>&1 || true
+        printf '\n=== socket ===\n'
+        ls -l "${SOCKET_PATH}" 2>&1 || printf '%s absent\n' "${SOCKET_PATH}"
+        ls -ld /var/api 2>&1 || true
+    } > "${DIAG_FILE}" 2>&1 || true
+    if [ -n "${APP_GROUP}" ]; then
+        chown "${APP_USER}:${APP_GROUP}" "${DIAG_FILE}" 2>/dev/null || true
+    fi
+    chmod 0640 "${DIAG_FILE}" 2>/dev/null || true
+    log ERROR "${reason}"
+    log ERROR "Diagnostics saved to ${DIAG_FILE}"
+}
+
+case "$1" in
+    configure)
+        mkdir -p "${DATA_DIR}" "${LOG_DIR}" 2>/dev/null || true
+
+        if ! getent passwd "${APP_USER}" >/dev/null 2>&1 \
+            && command -v useradd >/dev/null 2>&1; then
+            if getent group allusers >/dev/null 2>&1; then
+                useradd --system --no-create-home \
+                    --home-dir "${APP_DIR}" \
+                    --shell /usr/sbin/nologin \
+                    --gid allusers "${APP_USER}" 2>/dev/null || true
+            else
+                useradd --system --user-group --no-create-home \
+                    --home-dir "${APP_DIR}" \
+                    --shell /usr/sbin/nologin \
+                    "${APP_USER}" 2>/dev/null || true
+            fi
+        fi
+
+        if getent passwd "${APP_USER}" >/dev/null 2>&1; then
+            APP_GROUP="$(id -gn "${APP_USER}" 2>/dev/null || true)"
+            if [ -n "${APP_GROUP}" ]; then
+                chown -R "${APP_USER}:${APP_GROUP}" \
+                    "${DATA_DIR}" "${LOG_DIR}" 2>/dev/null || true
+            fi
+            chmod 0750 "${DATA_DIR}" "${LOG_DIR}" 2>/dev/null || true
+        fi
+
+        if [ -f "${WEBUI_ARCHIVE}" ] && command -v tar >/dev/null 2>&1; then
+            rm -rf "${WEBUI_DIR}"
+            mkdir -p "${WEBUI_DIR}"
+            if tar -xjf "${WEBUI_ARCHIVE}" -C "${WEBUI_DIR}" 2>&1; then
+                chown -R root:root "${WEBUI_DIR}" 2>/dev/null || true
+                chmod -R a+rX "${WEBUI_DIR}" 2>/dev/null || true
+            else
+                log ERROR "webui.bz2 could not be extracted"
+            fi
+        fi
+
+        if [ ! -d /var/api ]; then
+            mkdir -p /var/api
+            chmod 1777 /var/api 2>/dev/null || true
+        fi
+
+        if [ -d /run/systemd/system ]; then
+            MISSING=""
+            [ -f "${UNIT_SRC}" ] || MISSING="${MISSING} ${UNIT_SRC}"
+            [ -x "${LAUNCHER}" ] || MISSING="${MISSING} ${LAUNCHER}"
+            [ -x /usr/bin/python3 ] || MISSING="${MISSING} /usr/bin/python3"
+            [ -f "${WEBUI_DIR}/index.html" ] || MISSING="${MISSING} ${WEBUI_DIR}/index.html"
+            if [ -n "${MISSING}" ]; then
+                collect_diagnostics "cannot start: missing${MISSING}"
+            else
+                cp -f "${UNIT_SRC}" "${UNIT_DST}"
+                chmod 0644 "${UNIT_DST}" 2>/dev/null || true
+                systemctl daemon-reload || true
+                systemctl enable "${SYSTEM_ID}.service" || true
+                systemctl reset-failed "${SYSTEM_ID}.service" 2>/dev/null || true
+                # A stale socket owned by the service user cannot be removed
+                # later from the sticky /var/api directory. Drop it while root.
+                if [ -S "${SOCKET_PATH}" ]; then
+                    rm -f "${SOCKET_PATH}" 2>/dev/null || true
+                fi
+                systemctl start "${SYSTEM_ID}.service" || true
+
+                WAITED=0
+                while [ "${WAITED}" -lt 25 ]; do
+                    if [ -S "${SOCKET_PATH}" ] \
+                        && systemctl is-active --quiet "${SYSTEM_ID}.service"; then
+                        break
+                    fi
+                    sleep 1
+                    WAITED=$((WAITED + 1))
+                done
+
+                if systemctl is-active --quiet "${SYSTEM_ID}.service" \
+                    && [ -S "${SOCKET_PATH}" ]; then
+                    log INFO "service active, socket ready after ${WAITED}s"
+                else
+                    collect_diagnostics "installed but not serving after 25s"
+                fi
+            fi
+        fi
+        ;;
+esac
+
+exit 0

@@ -1,0 +1,97 @@
+[zh-cn]
+name = "图片实验室"
+auth = "Yuii"
+descript = "离线生成指定分辨率或指定体积的测试图片，按真实编码结果校准体积，导出 CSV 清单与 ZIP，并测量目标地址的响应速度。"
+release_note = "0.1.0：首个版本，支持按分辨率/目标体积生成、双层体积校准、批量生成、CSV/ZIP 导出、内容与降采样探针，以及响应速度测量。"
+important = "所有图片在本机生成，不会上传到外部服务；体积校准会明确标注是否收敛。测速只向用户填写的目标地址发送只读 GET 请求。"
+
+[zh-hk]
+name = "圖片實驗室"
+auth = "Yuii"
+descript = "離線生成指定解像度或指定大小的測試圖片，按真實編碼結果校準大小，匯出 CSV 清單與 ZIP，並量度目標網址的回應速度。"
+release_note = "0.1.0：首個版本，支援按解像度/目標大小生成、雙層大小校準、批量生成、CSV/ZIP 匯出、內容與降取樣探針，以及回應速度量度。"
+important = "所有圖片均在本機生成，不會上載到外部服務；大小校準會明確標示是否收斂。測速只向使用者填寫的目標網址發送唯讀 GET 請求。"
+
+[en-us]
+name = "Image Lab"
+auth = "Yuii"
+descript = "Generate offline test images at an exact resolution or target byte size, calibrate against real encoder output, export CSV and ZIP, and measure response speed."
+release_note = "0.1.0: first release with resolution and byte-size generation, two-level size calibration, batch generation, CSV/ZIP export, content and downsampling probes, and response-speed measurement."
+important = "Images are generated locally and never uploaded. Every byte-size result states whether it converged. The speed test sends read-only GET requests to the URL you enter."
+
+[fr-fr]
+name = "Labo d'images"
+auth = "Yuii"
+descript = "Générez hors ligne des images de test à une résolution ou une taille d'octets précise, calibrez selon l'encodage réel, exportez en CSV/ZIP et mesurez les temps de réponse."
+release_note = "0.1.0 : première version avec génération par résolution ou taille cible, calibration en deux niveaux, lots, export CSV/ZIP, motifs de contenu et sondes de sous-échantillonnage, et mesure de latence."
+important = "Les images sont générées localement et ne sont jamais téléversées. Chaque résultat indique s'il a convergé. Le test de vitesse envoie uniquement des requêtes GET en lecture seule vers l'URL indiquée."
+
+[de-de]
+name = "Bildlabor"
+auth = "Yuii"
+descript = "Erzeugt offline Testbilder mit exakter Auflösung oder Zielgröße, kalibriert anhand echter Encoder-Ausgaben, exportiert CSV/ZIP und misst Antwortzeiten."
+release_note = "0.1.0: Erste Version mit Erzeugung nach Auflösung oder Zielgröße, zweistufiger Größenkalibrierung, Stapelverarbeitung, CSV/ZIP-Export, Inhalts- und Downsampling-Sonden sowie Antwortzeitmessung."
+important = "Bilder werden lokal erzeugt und nie hochgeladen. Jedes Größe-Ergebnis zeigt, ob es konvergiert ist. Der Geschwindigkeitstest sendet nur lesende GET-Anfragen an die eingegebene URL."
+
+[it-it]
+name = "Laboratorio immagini"
+auth = "Yuii"
+descript = "Genera offline immagini di test con risoluzione o dimensione in byte esatta, calibra sull'output reale del codificatore, esporta CSV/ZIP e misura i tempi di risposta."
+release_note = "0.1.0: prima versione con generazione per risoluzione o dimensione target, calibrazione a due livelli, lotti, esportazione CSV/ZIP, sonde di contenuto e downsampling, e misura della velocità di risposta."
+important = "Le immagini sono generate localmente e non vengono mai caricate. Ogni risultato indica se ha raggiunto la tolleranza. Il test invia solo richieste GET in sola lettura all'URL indicato."
+
+[es-es]
+name = "Laboratorio de imágenes"
+auth = "Yuii"
+descript = "Genera imágenes de prueba sin conexión con resolución o tamaño en bytes exactos, calibra con la codificación real, exporta CSV/ZIP y mide la velocidad de respuesta."
+release_note = "0.1.0: primera versión con generación por resolución o tamaño objetivo, calibración en dos niveles, lotes, exportación CSV/ZIP, patrones de contenido y sondas de submuestreo, y medición de latencia."
+important = "Las imágenes se generan localmente y nunca se suben. Cada resultado indica si convergió. La prueba de velocidad solo envía solicitudes GET de lectura a la URL indicada."
+
+[hu-hu]
+name = "Képlabor"
+auth = "Yuii"
+descript = "Offline tesztképek készítése pontos felbontással vagy célmérettel, valós kódolási eredményre kalibrálva, CSV/ZIP exporttal és válaszidő-méréssel."
+release_note = "0.1.0: első kiadás felbontás vagy célméret szerinti generálással, kétszintű méretkalibrációval, kötegelt feldolgozással, CSV/ZIP exporttal, tartalom- és mintavételezési mintákkal, valamint válaszidő-méréssel."
+important = "A képek helyben készülnek, és soha nem kerülnek feltöltésre. Minden méreteredmény jelzi, hogy elérte-e a tűrést. A sebességteszt csak olvasási GET kéréseket küld a megadott címre."
+
+[ja-jp]
+name = "画像ラボ"
+auth = "Yuii"
+descript = "指定した解像度や目標バイトサイズのテスト画像をオフラインで生成し、実際のエンコード結果で較正して CSV/ZIP を出力、応答速度も測定します。"
+release_note = "0.1.0：初回リリース。解像度・目標サイズ指定の生成、2段階サイズ較正、一括生成、CSV/ZIP 出力、コンテンツとダウンサンプリング用プローブ、応答速度測定に対応。"
+important = "画像はすべてローカルで生成され、外部へアップロードされません。各サイズ結果には収束したかどうかが明示されます。速度測定は入力された URL へ読み取り専用の GET リクエストのみを送信します。"
+
+[ko-kr]
+name = "이미지 랩"
+auth = "Yuii"
+descript = "지정한 해상도 또는 목표 바이트 크기의 테스트 이미지를 오프라인으로 생성하고 실제 인코딩 결과로 보정하며 CSV/ZIP 내보내기와 응답 속도 측정을 제공합니다."
+release_note = "0.1.0: 첫 버전. 해상도/목표 크기 생성, 2단계 크기 보정, 일괄 생성, CSV/ZIP 내보내기, 콘텐츠 및 다운샘플링 프로브, 응답 속도 측정을 지원합니다."
+important = "이미지는 로컬에서 생성되며 외부로 업로드되지 않습니다. 모든 크기 결과에는 수렴 여부가 표시됩니다. 속도 측정은 입력한 URL로 읽기 전용 GET 요청만 보냅니다."
+
+[pl-pl]
+name = "Laboratorium obrazów"
+auth = "Yuii"
+descript = "Generuje offline obrazy testowe o dokładnej rozdzielczości lub rozmiarze, kalibruje według rzeczywistego kodowania, eksportuje CSV/ZIP i mierzy czas odpowiedzi."
+release_note = "0.1.0: pierwsza wersja z generowaniem według rozdzielczości lub rozmiaru docelowego, dwupoziomową kalibracją rozmiaru, generowaniem wsadowym, eksportem CSV/ZIP, wzorcami treści i sondami próbkowania oraz pomiarem czasu odpowiedzi."
+important = "Obrazy są generowane lokalnie i nigdy nie są wysyłane. Każdy wynik rozmiaru wskazuje, czy osiągnął tolerancję. Test szybkości wysyła wyłącznie odczytowe żądania GET na podany adres."
+
+[ru-ru]
+name = "Фотолаборатория"
+auth = "Yuii"
+descript = "Создаёт офлайн тестовые изображения заданного разрешения или размера, калибрует по реальному результату кодирования, экспортирует CSV/ZIP и измеряет скорость отклика."
+release_note = "0.1.0: первая версия с генерацией по разрешению или целевому размеру, двухуровневой калибровкой размера, пакетной генерацией, экспортом CSV/ZIP, шаблонами содержимого и пробами понижающей дискретизации, а также измерением времени отклика."
+important = "Изображения создаются локально и никогда не загружаются наружу. Для каждого результата указано, достигнут ли допуск. Тест скорости отправляет только читающие GET-запросы на указанный адрес."
+
+[tr-tr]
+name = "Görsel Laboratuvarı"
+auth = "Yuii"
+descript = "Belirtilen çözünürlükte veya hedef bayt boyutunda test görsellerini çevrimdışı üretir, gerçek kodlama sonucuna göre kalibre eder, CSV/ZIP dışa aktarır ve yanıt hızını ölçer."
+release_note = "0.1.0: ilk sürüm; çözünürlük veya hedef boyuta göre üretim, iki aşamalı boyut kalibrasyonu, toplu üretim, CSV/ZIP dışa aktarma, içerik ve alt örnekleme probları ve yanıt hızı ölçümü içerir."
+important = "Görseller yerel olarak üretilir ve hiçbir zaman dışarı yüklenmez. Her boyut sonucu toleransa ulaşıp ulaşmadığını belirtir. Hız testi yalnızca girilen adrese salt okunur GET istekleri gönderir."
+
+[pt-pt]
+name = "Laboratório de imagens"
+auth = "Yuii"
+descript = "Gera imagens de teste offline com resolução ou tamanho exato, calibra pelo resultado real da codificação, exporta CSV/ZIP e mede a velocidade de resposta."
+release_note = "0.1.0: primeira versão com geração por resolução ou tamanho alvo, calibração em dois níveis, geração em lote, exportação CSV/ZIP, padrões de conteúdo e sondas de subamostragem, e medição de latência."
+important = "As imagens são geradas localmente e nunca são enviadas para fora. Cada resultado indica se convergiu. O teste de velocidade envia apenas pedidos GET de leitura para o endereço indicado."

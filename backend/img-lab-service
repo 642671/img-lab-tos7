@@ -1,0 +1,15 @@
+#!/usr/bin/python3
+"""Entry point used by the systemd unit."""
+
+import os
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+for candidate in (HERE, os.path.join(os.path.dirname(HERE), "lib")):
+    if candidate not in sys.path:
+        sys.path.insert(0, candidate)
+
+from img_lab.server import main  # noqa: E402
+
+if __name__ == "__main__":
+    sys.exit(main())
